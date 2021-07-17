@@ -95,7 +95,18 @@ usethis::use_data(products)
       - `usethis::use_mit_license()`
     - Undocumented datasets / code objects
       - Add `./R/data.R` with roxygen stub for each dataset
-    - LazyData
+    - LazyData used without specifying LazyDataCompression (for large files)
+      - Added `LazyDataCompression: gzip` to DESCRIPTION
   - Note
     - installed package size
+      - The dataset is relatively large
+      - Won't fix
     - no visible binding for global ...
+      - Used `Prefixer::` on `./R/app.R` (from Addins)
+      - Skipped all functions / data from {shiny} and {er.injuries.sandpit}
+      - `%>%`:
+        - add package docs `use_package_doc()` then `use_pipe(export = FALSE)`
+      - datasets:
+        - replace `injuries` with `injuries <- get("injuries")`
+      - column names:
+        - wrap with .data[[colname]]
