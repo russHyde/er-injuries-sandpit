@@ -92,7 +92,9 @@ usethis::use_data(products)
       - `usethis::use_package("dplyr")` and same for "ggplot2"
   - Warning
     - Non-standard license
+      - `usethis::use_mit_license()`
     - Undocumented datasets / code objects
+      - Add `./R/data.R` with roxygen stub for each dataset
     - LazyData
   - Note
     - installed package size
