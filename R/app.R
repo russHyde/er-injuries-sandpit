@@ -4,7 +4,10 @@
 
 er_app <- function() {
   # `injuries`, `products` and `population` are package-hosted datasets
-  # They can be accessed by name
+  # They can be accessed by name (but R CMD check complains about you referring to undefined vars)
+  injuries <- get("injuries")
+  products <- get("products")
+  population <- get("population")
 
   prod_codes <- stats::setNames(products$prod_code, products$title)
 
