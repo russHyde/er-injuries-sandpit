@@ -72,3 +72,28 @@ usethis::use_data(products)
 - Removed the `./neiss/` directory (all associated data are now in `./data/`)
 
 - Removed the use of `vroom::vroom()` and `library(vroom)`
+
+## Checked the package loads / builds / checks etc
+
+- "Load All" passed
+- "Clean and Rebuild" failed: needed a NAMESPACE
+  - Ran `devtools::document()`
+- "Clean and Rebuild" then passed
+- "Test Package" failed because no testing infrastructure has been added yet
+- "Check package" failed
+  - Errors
+    - `library(shiny)`
+      - Removed the `library(shiny)` call
+      - `usethis::use_package("shiny")`
+      - Then placed `#' @import   shiny` above `er_app` definition
+      - Ran document() again
+    - `library(tidyverse)`
+      - Removed the `library(tidyverse)` call
+      - `usethis::use_package("dplyr")` and same for "ggplot2"
+  - Warning
+    - Non-standard license
+    - Undocumented datasets / code objects
+    - LazyData
+  - Note
+    - installed package size
+    - no visible binding for global ...
