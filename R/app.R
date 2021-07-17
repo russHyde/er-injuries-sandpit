@@ -1,5 +1,6 @@
-library(shiny)
-library(tidyverse)
+#' er_app
+#'
+#' @import   shiny
 
 er_app <- function() {
   # `injuries`, `products` and `population` are package-hosted datasets
