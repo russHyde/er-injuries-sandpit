@@ -1,11 +1,9 @@
 library(shiny)
-library(vroom)
 library(tidyverse)
 
 er_app <- function() {
-  injuries <- vroom::vroom("neiss/injuries.tsv.gz")
-  products <- vroom::vroom("neiss/products.tsv")
-  population <- vroom::vroom("neiss/population.tsv")
+  # `injuries`, `products` and `population` are package-hosted datasets
+  # They can be accessed by name
 
   prod_codes <- setNames(products$prod_code, products$title)
 
