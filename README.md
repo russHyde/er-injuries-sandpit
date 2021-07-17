@@ -59,7 +59,7 @@ usethis::use_description(
 )
 ```
 
-### Replacing `read.csv`
+### Replacing file-imports (`vroom::vroom`)
 
 - Created package datasets for `injuries`, `population` and `products`
 
