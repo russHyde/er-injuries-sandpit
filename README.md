@@ -72,3 +72,41 @@ usethis::use_data(products)
 - Removed the `./neiss/` directory (all associated data are now in `./data/`)
 
 - Removed the use of `vroom::vroom()` and `library(vroom)`
+
+## Checked the package loads / builds / checks etc
+
+- "Load All" passed
+- "Clean and Rebuild" failed: needed a NAMESPACE
+  - Ran `devtools::document()`
+- "Clean and Rebuild" then passed
+- "Test Package" failed because no testing infrastructure has been added yet
+- "Check package" failed
+  - Errors
+    - `library(shiny)`
+      - Removed the `library(shiny)` call
+      - `usethis::use_package("shiny")`
+      - Then placed `#' @import   shiny` above `er_app` definition
+      - Ran document() again
+    - `library(tidyverse)`
+      - Removed the `library(tidyverse)` call
+      - `usethis::use_package("dplyr")` and same for "ggplot2"
+  - Warning
+    - Non-standard license
+      - `usethis::use_mit_license()`
+    - Undocumented datasets / code objects
+      - Add `./R/data.R` with roxygen stub for each dataset
+    - LazyData used without specifying LazyDataCompression (for large files)
+      - Added `LazyDataCompression: gzip` to DESCRIPTION
+  - Note
+    - installed package size
+      - The dataset is relatively large
+      - Won't fix
+    - no visible binding for global ...
+      - Used `Prefixer::` on `./R/app.R` (from Addins)
+      - Skipped all functions / data from {shiny} and {er.injuries.sandpit}
+      - `%>%`:
+        - add package docs `use_package_doc()` then `use_pipe(export = FALSE)`
+      - datasets:
+        - replace `injuries` with `injuries <- get("injuries")`
+      - column names:
+        - wrap with .data[[colname]]

@@ -1,11 +1,15 @@
-library(shiny)
-library(tidyverse)
+#' er_app
+#'
+#' @import   shiny
 
 er_app <- function() {
   # `injuries`, `products` and `population` are package-hosted datasets
-  # They can be accessed by name
+  # They can be accessed by name (but R CMD check complains about you referring to undefined vars)
+  injuries <- get("injuries")
+  products <- get("products")
+  population <- get("population")
 
-  prod_codes <- setNames(products$prod_code, products$title)
+  prod_codes <- stats::setNames(products$prod_code, products$title)
 
   ui <- fluidPage(
     fluidRow(
@@ -25,31 +29,32 @@ er_app <- function() {
   )
 
   server <- function(input, output, session) {
-    selected <- reactive(injuries %>% filter(prod_code == input$code))
+
+    selected <- reactive(injuries %>% dplyr::filter(.data[["prod_code"]] == input$code))
 
     output$diag <- renderTable(
-      selected() %>% count(diag, wt = weight, sort = TRUE)
+      selected() %>% dplyr::count(.data[["diag"]], wt = .data[["weight"]], sort = TRUE)
     )
     output$body_part <- renderTable(
-      selected() %>% count(body_part, wt = weight, sort = TRUE)
+      selected() %>% dplyr::count(.data[["body_part"]], wt = .data[["weight"]], sort = TRUE)
     )
     output$location <- renderTable(
-      selected() %>% count(location, wt = weight, sort = TRUE)
+      selected() %>% dplyr::count(.data[["location"]], wt = .data[["weight"]], sort = TRUE)
     )
 
     summary <- reactive({
       selected() %>%
-        count(age, sex, wt = weight) %>%
-        left_join(population, by = c("age", "sex")) %>%
-        mutate(rate = n / population * 1e4)
+        dplyr::count(.data[["age"]], .data[["sex"]], wt = .data[["weight"]]) %>%
+        dplyr::left_join(population, by = c("age", "sex")) %>%
+        dplyr::mutate(rate = .data[["n"]] / .data[["population"]] * 1e4)
     })
 
     output$age_sex <- renderPlot(
       {
         summary() %>%
-          ggplot(aes(age, n, colour = sex)) +
-          geom_line() +
-          labs(y = "Estimated number of injuries")
+          ggplot2::ggplot(ggplot2::aes(.data[["age"]], .data[["n"]], colour = .data[["sex"]])) +
+          ggplot2::geom_line() +
+          ggplot2::labs(y = "Estimated number of injuries")
       },
       res = 96
     )
