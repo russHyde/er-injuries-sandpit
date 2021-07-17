@@ -20,4 +20,5 @@ Imports:
     ggplot2,
     dplyr,
     shiny,
-    magrittr
+    magrittr,
+    rlang
