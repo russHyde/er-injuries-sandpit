@@ -32,13 +32,13 @@ er_app <- function() {
     selected <- reactive(injuries %>% dplyr::filter(.data[["prod_code"]] == input$code))
 
     output$diag <- renderTable(
-      selected() %>% dplyr::count(.data[["diag"]], wt = .data[["weight"]], sort = TRUE)
+      count_by_weight(selected(), "diag")
     )
     output$body_part <- renderTable(
-      selected() %>% dplyr::count(.data[["body_part"]], wt = .data[["weight"]], sort = TRUE)
+      count_by_weight(selected(), "body_part")
     )
     output$location <- renderTable(
-      selected() %>% dplyr::count(.data[["location"]], wt = .data[["weight"]], sort = TRUE)
+      count_by_weight(selected(), "location")
     )
 
     summary <- reactive({

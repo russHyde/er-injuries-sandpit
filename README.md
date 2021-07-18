@@ -205,3 +205,5 @@ count_by_weight <- function(x, column) {
 - Then, when all the behaviours we want are implemented, and all tests pass, we run:
   - styler::style_package()
   - devtools::check() [Ctrl-Shift-E]
+  
+- Used `count_by_weight` in the server function
