@@ -110,3 +110,98 @@ usethis::use_data(products)
         - replace `injuries` with `injuries <- get("injuries")`
       - column names:
         - wrap with .data[[colname]]
+
+## Adding a test for a (non-reactive) function
+
+- Identify some functionality that we could test:
+  - The 'renderTable' calls in the server function are duplicated
+  - Suggest: make a function to abstract the non-reactive logic away
+  
+- Do we add function first, or test first?
+  - Neither: we decide what the behaviour of the function should be first
+
+- The calls look like:
+  - `some_data_frame %>% dplyr::count(.data[[some_column]], wt = .data[["weight"]], sort = TRUE)`
+  - So the function should:
+    - count up the different types of entry in one column,
+    - weighted by a value in some other column,
+    - and then sort the table before output (how? increasing or decreasing)
+
+- Design concerns
+  - The input is a data-frame (a tibble here):
+  - The output could be a data-frame too:
+    - one column for the counted-column;
+    - and one column for the count
+  - it's good to be precise about the return type:
+    - so you could definitely return a tibble
+    - or you could definitely return the same type (data.frame, tibble, ... etc) as the input
+  - and liberal about the input type
+    - the data-frame input may need to be extended in the future ...
+  - should we allow the user to specify:
+    - which column provides the weights?
+    - whether the output is sorted?
+    - IMO, no: if required, the caller can use dplyr::count; here, we're just constraining 'count'
+    to work with our particular dataset
+
+- We add the barebones of:
+  - a function to `./R/count_by_weight.R`
+    - `use_r("count_by_weight")`
+    - `count_by_weight <- function(x) x`
+  - a test to `./tests/testthat/test-count_by_weight.R`
+    - `use_test("count_by_weight")`
+    - This adds testing infrastructure (testthat -> DESCRIPTION::Suggests, etc)
+
+- We'll work test first
+
+- New test "Output values are sorted":
+  - Added the following code
+  - Then ran all tests for the package (`[Ctrl-Shift-T]`)
+  
+```
+test_that("it returns in count-sorted order", {
+  df <- tibble::tibble(
+    x = c(rep("a", 5), rep("b", 3), rep("c", 9)),
+    weight = 1
+  )
+
+  counted <- count_by_weight(df, column = "x")
+  expect_equal(
+    object = counted[["n"]],
+    expected = sort(counted[["n"]])
+  )
+})
+```
+
+- That's a failing test:
+  - We needed to state which column should be counted (so we add that to `count_by_weight`s formals)
+  - Doing that makes the test pass trivially
+  - But we don't even have a count column (`n`) in the output
+  - ... so maybe that was a silly test to add first
+
+- Add another test:
+  - The colnames of the returned object should be (x, "n")
+  - ... where x is the counted column from the input
+  - code not shown
+  - the following trivial implementation makes both tests pass
+
+```
+count_by_weight <- function(x, column) {
+  tibble::tibble(
+    {{ column }} := character(0),
+    n = numeric(0)
+  )
+}
+```
+
+- Then we add a bunch more tests:
+  - counts equal number of rows when weights are 1
+  - counts can be weighted
+
+- ... and fix the code so that each test passes, and then any newly-failing tests pass as well:
+  - eg, this revealed that:
+    - dplyr::count(... sort = TRUE) returns in decreasing order,
+    - but base::sort returns in increasing order (so our test was wrong)
+
+- Then, when all the behaviours we want are implemented, and all tests pass, we run:
+  - styler::style_package()
+  - devtools::check() [Ctrl-Shift-E]
