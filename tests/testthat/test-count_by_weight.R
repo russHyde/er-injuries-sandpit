@@ -19,6 +19,6 @@ test_that("it returns in count-sorted order", {
   counted <- count_by_weight(df, column = "x")
   expect_equal(
     object = counted[["n"]],
-    expected = sort(counted[["n"]])
+    expected = sort(counted[["n"]], decreasing = TRUE)
   )
 })
