@@ -22,3 +22,16 @@ test_that("it returns in count-sorted order", {
     expected = sort(counted[["n"]], decreasing = TRUE)
   )
 })
+
+test_that("count equals number of rows, when weights are all 1", {
+  number_of_a <- 5
+  df <- tibble::tibble(
+    y = c(rep("a", number_of_a)),
+    weight = 1
+  )
+
+  expect_equal(
+    count_by_weight(df, column = "y")[["n"]],
+    expected = number_of_a
+  )
+})

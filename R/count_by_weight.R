@@ -1,6 +1,3 @@
 count_by_weight <- function(x, column) {
-  tibble::tibble(
-    {{ column }} := character(0),
-    n = numeric(0)
-  )
+  dplyr::count(x, .data[[ column ]], sort = TRUE)
 }
