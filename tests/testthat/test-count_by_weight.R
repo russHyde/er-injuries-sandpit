@@ -26,12 +26,24 @@ test_that("it returns in count-sorted order", {
 test_that("count equals number of rows, when weights are all 1", {
   number_of_a <- 5
   df <- tibble::tibble(
-    y = c(rep("a", number_of_a)),
+    y = rep("a", number_of_a),
     weight = 1
   )
 
   expect_equal(
     count_by_weight(df, column = "y")[["n"]],
     expected = number_of_a
+  )
+})
+
+test_that("non-equal weights", {
+  weights <- c(0.2, 0.5, 0.7, 0.1, 0.3)
+  df <- tibble::tibble(
+    z = rep("a", length(weights)),
+    weight = weights
+  )
+  expect_equal(
+    count_by_weight(df, column = "z")[["n"]],
+    expected = sum(weights)
   )
 })
