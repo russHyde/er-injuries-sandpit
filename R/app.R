@@ -29,7 +29,6 @@ er_app <- function() {
   )
 
   server <- function(input, output, session) {
-
     selected <- reactive(injuries %>% dplyr::filter(.data[["prod_code"]] == input$code))
 
     output$diag <- renderTable(
