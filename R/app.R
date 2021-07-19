@@ -43,8 +43,6 @@ er_ui <- function(products) {
 
 make_er_server <- function(injuries, products, population) {
   function(input, output, session) {
-    some_random_variable_name <- reactive(1)
-
     selected <- reactive({
       injuries %>% dplyr::filter(.data[["prod_code"]] == input$code)
     })
