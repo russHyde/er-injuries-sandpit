@@ -17,16 +17,11 @@ test_that("it updates tables when product-code changes", {
   )
 
   # pass test-data into the server function
-  server <- function(input, output, session) {
-    er_server(
-      input,
-      output,
-      session,
-      injuries = test_injuries,
-      products = test_products,
-      population = test_population
-    )
-  }
+  server <- make_er_server(
+    injuries = test_injuries,
+    products = test_products,
+    population = test_population
+  )
 
   # check that the summary table
   # ? should we check the values of `output$location` etc ...
