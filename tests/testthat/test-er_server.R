@@ -1,3 +1,5 @@
+# TODO: test that the summary() data frame updates correctly (a bit harder than the test here)
+
 test_that("it updates tables when product-code changes", {
   # define test-data
   test_injuries <- tibble::tibble(
@@ -23,25 +25,22 @@ test_that("it updates tables when product-code changes", {
     population = test_population
   )
 
-  # check that the summary table
-  # ? should we check the values of `output$location` etc ...
+  # check that the 'selected' table updates correctly
   testServer(
     server,
     {
       session$setInputs(code = 2345)
-      expect_equal(
-        some_random_variable_name(),
-        1
-      )
 
       expect_equal(
         selected(),
         test_injuries[integer(0), ]
       )
 
+      session$setInputs(code = 1234)
+
       expect_equal(
-        summary(),
-        expected = "BLAH"
+        selected(),
+        test_injuries[c(1, 3), ]
       )
     }
   )
