@@ -289,3 +289,68 @@ test_that("it can handle test data", {
     - To configure a server function it's better to use a maker:
     - `make_server <- function(data) {function(input, output, session) {blarg}}`
     - `test_server <- make_server(test_data)`
+
+## Add a reactivity test for a module
+
+- What changes are required?
+  - Need at least one module to test
+    - Simplest candidate is the `output$[body_part|diag|location|]`
+    - The three different outputs are created the same way
+    - Should the module create a single output (eg, just for `diag`) or the three together
+    - Suggest: make a module that makes all three (then split it further if required)
+
+- Separating out the module
+  - this was straightforward, following Ch19 of Mastering Shiny
+  - introduced `./R/mod-count_tables.R` with functions `count_tables_[ui|server]`
+  - the `count_tables_server` takes the reactive `selected` as a parameter
+
+- But what should we test?
+  - The (server part) of the module creates a count table, then renders that for formatting by
+  the UI
+  - should the test be `expect_equal(the_df, the_expected_df)`
+  - or should it be `expect_equal(the_rendered_df, renderTable(the_expected_df))`
+  - For sanity's sake, it's easier to compare the contents of a tibble, than of an html-formatted
+  version of that tibble
+  - Therefore, we refactored the module code again
+  - Computing the summarised tibbles is now separated from rendering of the tibble:
+
+```
+...
+# before
+output$diag <- renderTable(count_by_weight(selected(), "diag"))
+
+# after
+diag <- count_by_weight(selected(), "diag")
+output$diag <- renderTable(diag)
+...
+
+# Sorry, no it isn't.
+# After it's like this:
+diag <- reactive(count_by_weight(selected(), "diag"))
+output$diag <- renderTable(diag())
+```
+
+A minimal test skeleton for testing a module is:
+
+```
+test_that("the module behaves correctly", {
+  rx_argument<- reactive(something)
+  bar <- a_normal_r_object
+
+  testServer(my_server, args = list(param = rx_argument), {
+    # NOTES:
+    # - Simpler to test the data than it's rendered form
+    # - use `session$flushReact()` if you want to update the reactive graph
+    # - use `session$getReturned()` if you want to check the returned value
+    expect_equal(
+      foo(),
+      expected = bar
+    )
+  })
+})
+
+```
+
+The resulting code (in `count_tables_server`) is a bit duplicated, but that can be fixed, and
+at least there's some tests wrapped around it, that would hopefully remain in a working state
+after refactoring.
