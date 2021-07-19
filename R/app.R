@@ -48,7 +48,11 @@ er_server <- function(input,
                       injuries,
                       products,
                       population) {
-  selected <- reactive(injuries %>% dplyr::filter(.data[["prod_code"]] == input$code))
+  some_random_variable_name <- reactive(1)
+
+  selected <- reactive({
+    injuries %>% dplyr::filter(.data[["prod_code"]] == input$code)
+  })
 
   output$diag <- renderTable(
     count_by_weight(selected(), "diag")
