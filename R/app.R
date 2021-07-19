@@ -9,6 +9,16 @@ er_app <- function() {
   products <- get("products")
   population <- get("population")
 
+  ui <- er_ui(products = products)
+
+  server <- make_er_server(
+    injuries = injuries, products = products, population = population
+  )
+
+  shiny::shinyApp(ui, server)
+}
+
+er_ui <- function(products) {
   prod_codes <- stats::setNames(products$prod_code, products$title)
 
   ui <- fluidPage(
@@ -28,8 +38,16 @@ er_app <- function() {
     )
   )
 
-  server <- function(input, output, session) {
-    selected <- reactive(injuries %>% dplyr::filter(.data[["prod_code"]] == input$code))
+  ui
+}
+
+make_er_server <- function(injuries, products, population) {
+  function(input, output, session) {
+    some_random_variable_name <- reactive(1)
+
+    selected <- reactive({
+      injuries %>% dplyr::filter(.data[["prod_code"]] == input$code)
+    })
 
     output$diag <- renderTable(
       count_by_weight(selected(), "diag")
@@ -58,6 +76,4 @@ er_app <- function() {
       res = 96
     )
   }
-
-  shiny::shinyApp(ui, server)
 }
