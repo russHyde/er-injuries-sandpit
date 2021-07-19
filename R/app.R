@@ -28,11 +28,7 @@ er_ui <- function(products) {
         selectInput("code", "Product", choices = prod_codes)
       )
     ),
-    fluidRow(
-      column(4, tableOutput("diag")),
-      column(4, tableOutput("body_part")),
-      column(4, tableOutput("location"))
-    ),
+    count_tables_ui("countTables"),
     fluidRow(
       column(12, plotOutput("age_sex"))
     )
@@ -47,15 +43,7 @@ make_er_server <- function(injuries, products, population) {
       injuries %>% dplyr::filter(.data[["prod_code"]] == input$code)
     })
 
-    output$diag <- renderTable(
-      count_by_weight(selected(), "diag")
-    )
-    output$body_part <- renderTable(
-      count_by_weight(selected(), "body_part")
-    )
-    output$location <- renderTable(
-      count_by_weight(selected(), "location")
-    )
+    count_tables_server("countTables", selected = selected)
 
     summary <- reactive({
       selected() %>%
