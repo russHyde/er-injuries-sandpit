@@ -207,3 +207,85 @@ count_by_weight <- function(x, column) {
   - devtools::check() [Ctrl-Shift-E]
   
 - Used `count_by_weight` in the server function
+
+## Add a reactivity-test for a server function
+
+- What changes to the app are required to set up reactivity tests?
+  - Need a server function that we can test
+    - All ui and server code is currently defined inside `er_app`
+    - Plan: refactor into `er_app`, `er_ui` and `er_server`
+  - Need to be able to pass test data into the server function
+    - Use of `injuries`, `population` and `products` is currently hard-coded into the app
+    - Plan: make these arguments to the `er_[app|ui|server]` functions
+
+- First attempt:
+  - Use purrr::partial to create a server function with the data injected in
+  - This worked for running the app, but not for testing (because the 'session' argument wasn't
+  explicit in the partialised function)
+  - ? Would a module be a better option
+
+- Second attempt:
+  - Use `server <- function(input, output, server) {configurable_server(i.., o.., s.., data = etc)}`
+  - This also failed in testing, because testServer couldn't access reactives in the configured
+  function
+
+- Third attempt:
+  - Use a nested function to inject datasets into the server function
+  - `make_server <- function(data) {function(i.., o.., s..){ ... }}`
+
+- What should we test?
+  - On changing product-code, (one of) the tables updates
+  
+- Workflow:
+  - Add a test file `use_test("er_server")`
+  - Define what the test does `test_that("it updates tables when product-code changes", {...})`
+  - Add some input data
+  - Add the testing machinery: `testServer(server, {})`
+  - Add a false test that should definitely fail
+  - Replace the false test with a real test
+  - Break the server function and check that the real test fails
+  - Fix the server function
+
+- A minimal setup for passing test-data into a server function:
+
+```
+make_server <- function(the_data) {
+  function(input, output, session) {
+    ...
+  }
+}
+
+test_that("it can handle test data", {
+  test_data <- tibble::tibble()
+  
+  server <- make_server(the_data = test_data)
+  
+  testServer(server, {
+    session$setInput(x = 1)
+    stop("We made it!")
+  })
+})
+```
+
+- Mistakes:
+  - Not having an explicit 'session' argument in the 'server' function
+    - We wanted to pass in some data to the server function
+    - I thought I could do `server <- purrr::partial(er_server, injuries = test_injuries, etc)`
+    - .. and then pass in the `server` object to `testServer`
+    - .. this throws an error:
+    - `Error: no applicable method for 'as.shiny.appobj' applied to an object of class
+    "c('purrr_function_partial', 'function')"`
+    - Note that `formals(server)` is just "..."
+    - But a shiny server object should have parameters "input", "output", "session"
+    - .. so we replaced `server` definition with
+    - `server <- function(input, output, session) er_server(input, output, session, injuries = etc)`
+    - (that is a legal shiny server object, but the test code failed for a different reason)
+  - Indirection in the server function:
+    - Passing in data using this: `srv <- function(i, o, s) srv1(i, o, s, data = etc)`
+    - .. is fine when _running_ an app
+    - But, testServer can't access reactives / variables within the resulting server function
+      - For example, in a server with a `summary()` reactive, the testServer was trying to access
+        `base::summary()`
+    - To configure a server function it's better to use a maker:
+    - `make_server <- function(data) {function(input, output, session) {blarg}}`
+    - `test_server <- make_server(test_data)`
