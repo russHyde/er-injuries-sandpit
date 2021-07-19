@@ -11,14 +11,19 @@ count_tables_server <- function(id, selected) {
   stopifnot(is.reactive(selected))
 
   moduleServer(id, function(input, output, session) {
-    output$diag <- renderTable(
+    diag <- reactive(
       count_by_weight(selected(), "diag")
     )
-    output$body_part <- renderTable(
+    output$diag <- renderTable(diag())
+
+    body_part <- reactive(
       count_by_weight(selected(), "body_part")
     )
-    output$location <- renderTable(
+    output$body_part <- renderTable(body_part())
+
+    location <- reactive(
       count_by_weight(selected(), "location")
     )
+    output$location <- renderTable(location())
   })
 }
