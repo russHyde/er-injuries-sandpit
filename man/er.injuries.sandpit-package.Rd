@@ -4,12 +4,13 @@
 \name{er.injuries.sandpit-package}
 \alias{er.injuries.sandpit}
 \alias{er.injuries.sandpit-package}
-\title{er.injuries.sandpit: What the Package Does (One Line, Title Case)}
+\title{er.injuries.sandpit: ER App From "Mastering Shiny"}
 \description{
-What the package does (one paragraph).
+This is a sandbox app for learning about various shiny tooling (testing machinery,
+    golem, modules, ...). Hadley Wickham wrote the original source code.
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Russ Hyde \email{russ.hyde@somewhere.com}
 
 }
 \keyword{internal}
