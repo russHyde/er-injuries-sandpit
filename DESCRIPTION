@@ -1,13 +1,13 @@
 Package: er.injuries.sandpit
-Title: What the Package Does (One Line, Title Case)
+Title: ER App From "Mastering Shiny"
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Russ",
+           family = "Hyde",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "russ.hyde@somewhere.com")
+Description: This is a sandbox app for learning about various shiny tooling (testing machinery,
+    golem, modules, ...). Hadley Wickham wrote the original source code. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
